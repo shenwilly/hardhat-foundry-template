@@ -1,8 +1,21 @@
+import { config as dotEnvConfig } from "dotenv";
+dotEnvConfig();
+
 import fs from "fs";
 import "@nomiclabs/hardhat-waffle";
+import "@nomiclabs/hardhat-etherscan";
 import "@typechain/hardhat";
 import "hardhat-preprocessor";
+import "hardhat-gas-reporter"
 import { HardhatUserConfig, task } from "hardhat/config";
+import {
+  ETHERSCAN_API_KEY,
+  PRIVATE_KEY,
+  NETWORK_FORK_URL,
+  NETWORK_MAINNET_URL,
+  NETWORK_RINKEBY_URL,
+  NETWORK_ROPSTEN_URL,
+} from "./constants";
 
 import example from "./tasks/example";
 
@@ -17,6 +30,7 @@ function getRemappings() {
 task("example", "Example task").setAction(example);
 
 const config: HardhatUserConfig = {
+  defaultNetwork: "hardhat",
   solidity: {
     version: "0.8.13",
     settings: {
@@ -25,6 +39,34 @@ const config: HardhatUserConfig = {
         runs: 200,
       },
     },
+  },
+  networks: {
+    hardhat: {
+      // allowUnlimitedContractSize: true,
+      forking: {
+        url: NETWORK_FORK_URL,
+        // blockNumber: 12984971,
+      },
+    },
+    mainnet: {
+      url: NETWORK_MAINNET_URL,
+      accounts: [PRIVATE_KEY],
+    },
+    rinkeby: {
+      url: NETWORK_RINKEBY_URL,
+      accounts: [PRIVATE_KEY],
+    },
+    ropsten: {
+      url: NETWORK_ROPSTEN_URL,
+      accounts: [PRIVATE_KEY],
+    },
+  },
+  etherscan: {
+    apiKey: ETHERSCAN_API_KEY,
+  },
+  gasReporter: {
+    enabled: false,
+    currency: "eth",
   },
   paths: {
     sources: "./src", // Use ./src rather than ./contracts as Hardhat expects
